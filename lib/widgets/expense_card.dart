@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class ExpenseCard extends StatelessWidget {
-  const ExpenseCard({super.key});
+  final double expense;
+
+  const ExpenseCard({super.key, required this.expense});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white,
+      color: Colors.grey[850],
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -23,9 +25,9 @@ class ExpenseCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            const Text(
-              '-\$23,000',
-              style: TextStyle(fontSize: 18, color: Colors.red),
+            Text(
+              '\$${expense.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 18, color: Colors.red),
             ),
           ],
         ),

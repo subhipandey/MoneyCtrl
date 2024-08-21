@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class TotalBalanceCard extends StatelessWidget {
-  const TotalBalanceCard({super.key});
+  final double balance;
+
+  const TotalBalanceCard({super.key, required this.balance});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white,
+      color: Colors.grey[850],
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -17,9 +19,9 @@ class TotalBalanceCard extends StatelessWidget {
               style: TextStyle(color: Colors.grey[400], fontSize: 12),
             ),
             const SizedBox(height: 8),
-            const Text(
-              '\$23,000',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            Text(
+              '\$${balance.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
           ],
         ),
