@@ -11,7 +11,14 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final VoidCallback onThemeToggle;
+  final bool isDarkMode;
+
+  const DashboardScreen({
+    super.key,
+    required this.onThemeToggle,
+    required this.isDarkMode,
+  });
 
   @override
   _DashboardScreenState createState() => _DashboardScreenState();
@@ -19,11 +26,18 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   List<Transaction> transactions = [];
+  bool _isDarkMode = false;
 
   @override
   void initState() {
     super.initState();
     loadTransactions();
+  }
+
+  void _toggleTheme() {
+    setState(() {
+      _isDarkMode = !_isDarkMode;
+    });
   }
 
   void loadTransactions() async {
@@ -32,14 +46,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (transactionsJson != null) {
       List<dynamic> decodedTransactions = jsonDecode(transactionsJson);
       setState(() {
-        transactions = decodedTransactions.map((item) => Transaction.fromMap(item)).toList();
+        transactions = decodedTransactions
+            .map((item) => Transaction.fromMap(item))
+            .toList();
       });
     }
   }
 
   void saveTransactions() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String transactionsJson = jsonEncode(transactions.map((t) => t.toMap()).toList());
+    String transactionsJson =
+        jsonEncode(transactions.map((t) => t.toMap()).toList());
     await prefs.setString('transactions', transactionsJson);
   }
 
@@ -51,16 +68,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   double get totalBalance {
-    return transactions.fold(0, (sum, transaction) => 
-      sum + (transaction.isIncome ? transaction.amount : -transaction.amount));
+    return transactions.fold(
+        0,
+        (sum, transaction) =>
+            sum +
+            (transaction.isIncome ? transaction.amount : -transaction.amount));
   }
 
   double get totalIncome {
-    return transactions.where((t) => t.isIncome).fold(0, (sum, transaction) => sum + transaction.amount);
+    return transactions
+        .where((t) => t.isIncome)
+        .fold(0, (sum, transaction) => sum + transaction.amount);
   }
 
   double get totalExpense {
-    return transactions.where((t) => !t.isIncome).fold(0, (sum, transaction) => sum + transaction.amount);
+    return transactions
+        .where((t) => !t.isIncome)
+        .fold(0, (sum, transaction) => sum + transaction.amount);
   }
 
   @override
@@ -69,33 +93,65 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: const Text('Dashboard'),
         actions: [
-          IconButton(icon: const Icon(Icons.lightbulb_outline), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+          IconButton(
+            icon: Icon(
+              _isDarkMode ? Icons.lightbulb : Icons.lightbulb_outline,
+            ),
+            onPressed: widget.onThemeToggle,
+          ),
+          IconButton(
+            icon: const Icon(Icons.more_vert),
+            onPressed: () {},
+          ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          TotalBalanceCard(balance: totalBalance),
+          TotalBalanceCard(
+            balance: totalBalance,
+            isDarkMode: _isDarkMode,
+          ),
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: IncomeCard(income: totalIncome)),
+              Expanded(
+                child: IncomeCard(
+                  income: totalIncome,
+                  isDarkMode: _isDarkMode,
+                ),
+              ),
               const SizedBox(width: 16),
-              Expanded(child: ExpenseCard(expense: totalExpense)),
+              Expanded(
+                child: ExpenseCard(
+                  expense: totalExpense,
+                  isDarkMode: _isDarkMode,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
-          const Text('Recent Transactions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text(
+            'Recent Transactions',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 8),
-          ...transactions.map((transaction) => TransactionCard(
-            icon: transaction.isIncome ? Icons.arrow_downward : Icons.arrow_upward,
-            title: transaction.title,
-            category: transaction.category,
-            amount: transaction.amount,
-            isIncome: transaction.isIncome,
-            date: DateFormat('MMM dd, yyyy').format(transaction.date),
-          )).toList(),
+          ...transactions
+              .map((transaction) => TransactionCard(
+                    icon: transaction.isIncome
+                        ? Icons.arrow_downward
+                        : Icons.arrow_upward,
+                    title: transaction.title,
+                    category: transaction.category,
+                    amount: transaction.amount,
+                    isIncome: transaction.isIncome,
+                    date: DateFormat('MMM dd, yyyy').format(transaction.date),
+                    isDarkMode: _isDarkMode,
+                  ))
+              .toList(),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -103,9 +159,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddTransactionScreen(
-              onAddTransaction: addTransaction,
-            )),
+            MaterialPageRoute(
+                builder: (context) => AddTransactionScreen(
+                      onAddTransaction: addTransaction,
+                    )),
           );
         },
       ),

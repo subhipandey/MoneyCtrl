@@ -7,31 +7,44 @@ class TransactionCard extends StatelessWidget {
   final double amount;
   final bool isIncome;
   final String date;
+  final bool isDarkMode;
 
-  const TransactionCard({super.key, 
+  const TransactionCard({
+    super.key,
     required this.icon,
     required this.title,
     required this.category,
     required this.amount,
     required this.isIncome,
     required this.date,
+    required this.isDarkMode,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white,
+      color: isDarkMode ? Colors.grey[850] : Colors.white,
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.grey[800],
+            color: isDarkMode ? Colors.grey[700] : Colors.grey[800],
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: Colors.white),
         ),
-        title: Text(title),
-        subtitle: Text(category),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        subtitle: Text(
+          category,
+          style: TextStyle(
+            color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+          ),
+        ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -43,11 +56,16 @@ class TransactionCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(date, style: TextStyle(fontSize: 12, color: Colors.grey[400])),
+            Text(
+              date,
+              style: TextStyle(
+                fontSize: 12,
+                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              ),
+            ),
           ],
         ),
       ),
-      
     );
   }
 }
