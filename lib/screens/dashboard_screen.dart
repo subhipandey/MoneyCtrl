@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:expense/model/transaction.dart';
 import 'package:expense/screens/add_transactions.dart';
+import 'package:expense/utils/csv_export_service.dart';
 import 'package:expense/widgets/expense_card.dart';
 import 'package:expense/widgets/income_card.dart';
 import 'package:expense/widgets/total_balance_card.dart';
@@ -67,6 +68,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  void editTransaction(Transaction updatedTransaction) {
+    setState(() {
+      int index = transactions.indexWhere((t) => t.id == updatedTransaction.id);
+      if (index != -1) {
+        transactions[index] = updatedTransaction;
+        saveTransactions();
+      }
+    });
+  }
+
+  void deleteTransaction(Transaction transaction) {
+    setState(() {
+      transactions.removeWhere((t) => t.id == transaction.id);
+      saveTransactions();
+    });
+  }
+
+  void exportTransactionsToCSV() {
+    CSVExportService.exportTransactionsToCSV(transactions);
+  }
+
   double get totalBalance {
     return transactions.fold(
         0,
@@ -99,9 +121,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             onPressed: widget.onThemeToggle,
           ),
-          IconButton(
+          PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
-            onPressed: () {},
+            onSelected: (value) {
+              if (value == 'export_csv') {
+                exportTransactionsToCSV();
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'export_csv',
+                child: Text('Export to CSV'),
+              ),
+            ],
           ),
         ],
       ),
@@ -140,17 +172,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           const SizedBox(height: 8),
           ...transactions
-              .map((transaction) => TransactionCard(
-                    icon: transaction.isIncome
-                        ? Icons.arrow_downward
-                        : Icons.arrow_upward,
-                    title: transaction.title,
-                    category: transaction.category,
-                    amount: transaction.amount,
-                    isIncome: transaction.isIncome,
-                    date: DateFormat('MMM dd, yyyy').format(transaction.date),
-                    isDarkMode: _isDarkMode,
-                  ))
+              .map(
+                (transaction) => TransactionCard(
+                  icon: transaction.isIncome
+                      ? Icons.arrow_downward
+                      : Icons.arrow_upward,
+                  title: transaction.title,
+                  category: transaction.category,
+                  amount: transaction.amount,
+                  isIncome: transaction.isIncome,
+                  date: DateFormat('MMM dd, yyyy').format(transaction.date),
+                  isDarkMode: _isDarkMode,
+                  transaction: transaction,
+                  onEdit: editTransaction,
+                  onDelete: deleteTransaction,
+                ),
+              )
               .toList(),
         ],
       ),

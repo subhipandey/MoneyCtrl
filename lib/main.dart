@@ -1,4 +1,3 @@
-import 'package:expense/data/theme_data.dart';
 import 'package:expense/screens/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 

@@ -2,27 +2,37 @@ import 'package:expense/model/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class AddTransactionScreen extends StatefulWidget {
-  final Function(Transaction) onAddTransaction;
+class EditTransactionScreen extends StatefulWidget {
+  final Transaction transaction;
+  final Function(Transaction) onEditTransaction;
 
-  const AddTransactionScreen({super.key, required this.onAddTransaction});
+  const EditTransactionScreen({
+    super.key,
+    required this.transaction,
+    required this.onEditTransaction,
+  });
 
   @override
-  _AddTransactionScreenState createState() => _AddTransactionScreenState();
+  _EditTransactionScreenState createState() => _EditTransactionScreenState();
 }
 
-class _AddTransactionScreenState extends State<AddTransactionScreen> {
+class _EditTransactionScreenState extends State<EditTransactionScreen> {
   final _formKey = GlobalKey<FormState>();
-  String? title;
-  double? amount;
-  String? transactionType;
-  String? category;
-  DateTime selectedDate = DateTime.now();
+  late String title;
+  late double amount;
+  late String transactionType;
+  late String category;
+  late DateTime selectedDate;
   final TextEditingController _dateController = TextEditingController();
 
-   @override
+  @override
   void initState() {
     super.initState();
+    title = widget.transaction.title;
+    amount = widget.transaction.amount;
+    transactionType = widget.transaction.isIncome ? 'Income' : 'Expense';
+    category = widget.transaction.category;
+    selectedDate = widget.transaction.date;
     _dateController.text = DateFormat('MMM dd, yyyy').format(selectedDate);
   }
 
@@ -35,7 +45,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   void _updateDateDisplay() {
     _dateController.text = DateFormat('MMM dd, yyyy').format(selectedDate);
   }
-
 
   List<String> categories = [
     'Housing',
@@ -55,7 +64,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Transaction'),
+        title: const Text('Edit Transaction'),
       ),
       body: Form(
         key: _formKey,
@@ -63,6 +72,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             TextFormField(
+              initialValue: title,
               decoration: InputDecoration(
                 hintText: 'Title',
                 border: OutlineInputBorder(
@@ -80,10 +90,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 }
                 return null;
               },
-              onSaved: (value) => title = value,
+              onSaved: (value) => title = value!,
             ),
             const SizedBox(height: 16),
             TextFormField(
+              initialValue: amount.toString(),
               decoration: InputDecoration(
                 hintText: 'Amount',
                 border: OutlineInputBorder(
@@ -129,7 +140,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  transactionType = value;
+                  transactionType = value!;
                 });
               },
               validator: (value) {
@@ -161,7 +172,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  category = value;
+                  category = value!;
                 });
               },
               validator: (value) {
@@ -207,33 +218,34 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Colors.blue, 
+                backgroundColor: Colors.blue,
                 padding: const EdgeInsets.symmetric(
-                    vertical: 16, horizontal: 24), 
+                    vertical: 16, horizontal: 24),
                 shape: RoundedRectangleBorder(
-                  // Add rounded corners
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               child: const Text(
-                'ADD TRANSACTION',
+                'SAVE CHANGES',
                 style: TextStyle(
-                  fontSize: 16, 
-                  fontWeight: FontWeight.bold, 
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  final newTransaction = Transaction(
-                    title: title!,
-                    amount: amount!,
+                  final updatedTransaction = Transaction(
+                    id: widget.transaction.id,
+                    title: title,
+                    amount: amount,
                     isIncome: transactionType == 'Income',
-                    category: category!,
+                    category: category,
                     date: selectedDate,
+                    createdAt: widget.transaction.createdAt,
+                    note: widget.transaction.note,
                   );
-                  widget.onAddTransaction(newTransaction);
+                  widget.onEditTransaction(updatedTransaction);
                   Navigator.pop(context);
                 }
               },
