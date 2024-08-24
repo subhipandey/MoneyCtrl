@@ -1,5 +1,6 @@
 import 'package:expense/screens/dashboard_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MainApp());
@@ -17,11 +18,12 @@ class _MainAppState extends State<MainApp> {
 
   void _toggleTheme() {
     setState(() {
-      _themeMode = (_themeMode == ThemeMode.light) ? ThemeMode.dark : ThemeMode.light;
+      _themeMode =
+          (_themeMode == ThemeMode.light) ? ThemeMode.dark : ThemeMode.light;
     });
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -29,11 +31,19 @@ class _MainAppState extends State<MainApp> {
         primarySwatch: Colors.blue,
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
+        textTheme: GoogleFonts.openSansTextTheme(
+          Theme.of(context).textTheme,
+        ),
       ),
       darkTheme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.dark,
         scaffoldBackgroundColor: Colors.grey[900],
+        textTheme:
+            GoogleFonts.openSansTextTheme(Theme.of(context).textTheme.apply(
+                  bodyColor: Colors.white,
+                  displayColor: Colors.white,
+                )),
       ),
       themeMode: _themeMode,
       home: DashboardScreen(
