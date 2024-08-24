@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:expense/model/transaction.dart';
+import 'package:expense/screens/about_screen.dart';
 import 'package:expense/screens/add_transactions.dart';
 import 'package:expense/utils/csv_export_service.dart';
 import 'package:expense/widgets/expense_card.dart';
@@ -126,12 +127,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onSelected: (value) {
               if (value == 'export_csv') {
                 exportTransactionsToCSV();
+              } else if (value == 'about') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AboutScreen(),
+                  ),
+                );
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
                 value: 'export_csv',
                 child: Text('Export to CSV'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'about',
+                child: Text('About'),
               ),
             ],
           ),
