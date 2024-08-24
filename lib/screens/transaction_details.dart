@@ -1,4 +1,5 @@
 import 'package:expense/model/transaction.dart';
+import 'package:expense/screens/edit_transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -7,7 +8,8 @@ class TransactionDetailsScreen extends StatelessWidget {
   final Function(Transaction) onEdit;
   final Function() onDelete;
 
-  const TransactionDetailsScreen({super.key, 
+  const TransactionDetailsScreen({
+    super.key,
     required this.transaction,
     required this.onEdit,
     required this.onDelete,
@@ -24,7 +26,23 @@ class TransactionDetailsScreen extends StatelessWidget {
         title: const Text('Details'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete_outline),
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditTransactionScreen(
+                    transaction: transaction,
+                    onEditTransaction: onEdit,
+                  ),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.delete_outline,
+            ),
             onPressed: () {
               // Show confirmation dialog before deleting
               showDialog(
@@ -32,7 +50,8 @@ class TransactionDetailsScreen extends StatelessWidget {
                 builder: (BuildContext context) {
                   return AlertDialog(
                     title: const Text('Delete Transaction'),
-                    content: const Text('Are you sure you want to delete this transaction?'),
+                    content: const Text(
+                        'Are you sure you want to delete this transaction?'),
                     actions: <Widget>[
                       TextButton(
                         child: const Text('Cancel'),
@@ -43,7 +62,8 @@ class TransactionDetailsScreen extends StatelessWidget {
                         onPressed: () {
                           onDelete();
                           Navigator.of(context).pop(); // Close dialog
-                          Navigator.of(context).pop(); // Go back to previous screen
+                          Navigator.of(context)
+                              .pop(); // Go back to previous screen
                         },
                       ),
                     ],
@@ -66,24 +86,19 @@ class TransactionDetailsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDetailItem('Title', transaction.title),
-            _buildDetailItem('Amount', '\$${transaction.amount.toStringAsFixed(2)}'),
-            _buildDetailItem('Transaction type', transaction.isIncome ? 'Income' : 'Expense'),
+            _buildDetailItem(
+                'Amount', '\₹${transaction.amount.toStringAsFixed(2)}'),
+            _buildDetailItem('Transaction type',
+                transaction.isIncome ? 'Income' : 'Expense'),
             _buildDetailItem('Tag', transaction.category),
-            _buildDetailItem('When', DateFormat('EEEE, dd MMM h:mm a').format(transaction.date)),
+            _buildDetailItem('When',
+                DateFormat('EEEE, dd MMM h:mm a').format(transaction.date)),
             _buildDetailItem('Note', transaction.note ?? ''),
-            _buildDetailItem('Created At', DateFormat('MMM dd, yyyy, h:mm a').format(transaction.createdAt)),
+            _buildDetailItem(
+                'Created At',
+                DateFormat('MMM dd, yyyy, h:mm a')
+                    .format(transaction.createdAt)),
             const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.edit),
-                label: const Text('EDIT'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  minimumSize: const Size(120, 40),
-                ),
-                onPressed: () {}
-              ),
-            ),
           ],
         ),
       ),

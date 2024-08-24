@@ -34,7 +34,7 @@ class IncomeCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '\$${income.toStringAsFixed(2)}',
+              '\₹${income.toStringAsFixed(2)}',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
