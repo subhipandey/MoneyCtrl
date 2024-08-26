@@ -1,14 +1,20 @@
 import 'package:expense/screens/dashboard_screen.dart';
+import 'package:expense/utils/secure_app.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(
+    const Directionality(
+      textDirection: TextDirection.ltr,
+      child: SecureApp(child: MainApp()),
+    ),
+  );
 }
+
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
-
   @override
   _MainAppState createState() => _MainAppState();
 }
