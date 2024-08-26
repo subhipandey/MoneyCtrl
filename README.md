@@ -5,7 +5,7 @@ Money Ctrl is a comprehensive expense tracker with a sleek, user-friendly interf
 
 Dashboard | Transaction Details | Add Transactions | Edit Transactions | Set Pattern 
 --- | --- | --- |--- |--- 
-![](https://github.com/subhipandey/MoneyCtrl/blob/main/images/dashboard.png) | ![](https://github.com/subhipandey/MoneyCtrl/blob/main/images/transactions_detail.png) | ![](https://github.com/subhipandey/MoneyCtrl/blob/main/images/add_transactions.png) | ![](https://github.com/subhipandey/MoneyCtrl/blob/main/images/edit_transactions.png) | ![](https://github.com/subhipandey/MoneyCtrl/blob/main/images/set_pattern.png)
+![](https://github.com/subhipandey/MoneyCtrl/blob/main/images/dashboard.png) | ![](https://github.com/subhipandey/MoneyCtrl/blob/main/images/transactions_detail.png) | ![](https://github.com/subhipandey/MoneyCtrl/blob/main/images/add_transactions.png) | ![](https://github.com/subhipandey/MoneyCtrl/blob/main/images/edit_transactions.png) | ![](https://github.com/subhipandey/MoneyCtrl/blob/main/images/set_pattern.png) |
 
 
 
