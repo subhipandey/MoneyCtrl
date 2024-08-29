@@ -1,23 +1,27 @@
+import 'package:flutter/material.dart';
+
 // Transaction model
 class Transaction {
   final String id;
+  final DateTime date;
   final String title;
   final double amount;
-  final bool isIncome;
   final String category;
+  final bool isIncome;
   final String? note;
-  final DateTime date;
   final DateTime createdAt;
+  GlobalKey? key;
 
   Transaction({
     String? id,
+    required this.date,
     required this.title,
     required this.amount,
-    required this.isIncome,
     required this.category,
-    required this.date,
+    required this.isIncome,
     this.note,
     DateTime? createdAt,
+    this.key,
   })  : id = id ?? DateTime.now().millisecondsSinceEpoch.toString(),
         createdAt = createdAt ?? DateTime.now();
 
@@ -38,11 +42,11 @@ class Transaction {
   factory Transaction.fromMap(Map<String, dynamic> map) {
     return Transaction(
        id: map['id'],
+      date: DateTime.parse(map['date']),
       title: map['title'],
       amount: map['amount'],
       isIncome: map['isIncome'],
       category: map['category'],
-      date: DateTime.parse(map['date']),
     );
   }
 }

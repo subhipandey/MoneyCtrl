@@ -23,11 +23,13 @@ class ExpenseCard extends StatelessWidget {
               children: [
                 const Icon(Icons.arrow_upward, color: Colors.red, size: 16),
                 const SizedBox(width: 8),
-                Text(
-                  'TOTAL EXPENSE',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
-                    fontSize: 12,
+                Expanded(
+                  child: Text(
+                    'TOTAL EXPENSE',
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ],
