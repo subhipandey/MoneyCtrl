@@ -1,75 +1,77 @@
 import 'dart:io';
-import 'package:expense/model/transaction.dart';
-import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
+import 'package:expense/model/transaction.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 class CSVExportService {
-  static Future<void> exportTransactionsToCSV(
-      List<Transaction> transactions) async {
-    List<List<dynamic>> rows = [
-      ['Title', 'Amount', 'Type', 'Category', 'Date', 'Note', 'Created At']
-    ];
-    for (var transaction in transactions) {
-      rows.add([
-        transaction.title,
-        transaction.amount,
-        transaction.isIncome ? 'Income' : 'Expense',
-        transaction.category,
-        DateFormat('yyyy-MM-dd').format(transaction.date),
-        transaction.note ?? '',
-        DateFormat('yyyy-MM-dd HH:mm:ss').format(transaction.createdAt),
-      ]);
+  static Future<String> exportTransactionsToCSV(List<Transaction> transactions) async {
+    final status = await Permission.storage.request();
+    
+    if (status.isGranted) {
+      Directory? directory = await getExternalStorageDirectory();
+      String downloadsPath = '${directory?.path.split('Android')[0]}Download';
+      
+      String fileName = 'transactions_${DateTime.now().millisecondsSinceEpoch}.csv';
+      String filePath = '$downloadsPath/$fileName';
+
+      File file = File(filePath);
+      
+      // Generate CSV content
+      String csv = 'Date,Title,Amount,Category,Type\n';
+      for (var transaction in transactions) {
+        csv += '${transaction.date},${transaction.title},${transaction.amount},${transaction.category},${transaction.isIncome ? 'Income' : 'Expense'}\n';
+      }
+
+      await file.writeAsString(csv);
+
+      return 'File saved to: $filePath';
+    } else {
+      throw Exception('Storage permission not granted');
     }
-    String csv = const ListToCsvConverter().convert(rows);
-    final directory = await getApplicationDocumentsDirectory();
-    final path = directory.path;
-    final file = File('$path/transactions.csv');
-    await file.writeAsString(csv);
-    await Share.shareXFiles([XFile(file.path)], text: 'Transactions CSV');
   }
 
-  static Future<String> storeCSVOnDevice(List<Transaction> transactions) async {
-    List<List<dynamic>> rows = [
-      ['Title', 'Amount', 'Type', 'Category', 'Date', 'Note', 'Created At']
-    ];
-    for (var transaction in transactions) {
-      rows.add([
-        transaction.title,
-        transaction.amount,
-        transaction.isIncome ? 'Income' : 'Expense',
-        transaction.category,
-        DateFormat('yyyy-MM-dd').format(transaction.date),
-        transaction.note ?? '',
-        DateFormat('yyyy-MM-dd HH:mm:ss').format(transaction.createdAt),
-      ]);
-    }
-    String csv = const ListToCsvConverter().convert(rows);
+  static Future<List<Transaction>> importTransactionsFromCSV(String filePath) async {
+    try {
+      final file = File(filePath);
+      final contents = await file.readAsString();
 
-    var status = await Permission.storage.request();
-    if (status.isGranted) {
-      Directory? storageDirectory;
-      if (Platform.isAndroid) {
-        storageDirectory = await getExternalStorageDirectory();
-      } else if (Platform.isIOS) {
-        storageDirectory = await getApplicationDocumentsDirectory();
+      // Split the contents into lines manually
+      List<String> lines = contents.split('\n');
+
+      // Remove header row
+      if (lines.length > 1) {
+        lines.removeAt(0);
       }
 
-      if (storageDirectory != null) {
-        final fileName = 'transactions_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.csv';
-        final filePath = '${storageDirectory.path}/$fileName';
-        final file = File(filePath);
-        await file.writeAsString(csv);
-        return filePath;
-      } else {
-        throw Exception('Could not access storage directory');
+      List<Transaction> importedTransactions = [];
+
+      for (String line in lines) {
+        List<String> row = line.split(',');
+        if (row.length >= 5) {
+          DateTime date;
+          try {
+            date = DateFormat('yyyy-MM-dd HH:mm:ss.SSSSSS').parse(row[0].trim());
+          } catch (e) {
+            date = DateFormat('yyyy-MM-dd').parse(row[0].trim());
+          }
+          
+          importedTransactions.add(Transaction(
+            id: DateTime.now().millisecondsSinceEpoch.toString(), // Generate a new ID
+            date: date,
+            title: row[1].trim(),
+            amount: double.parse(row[2].trim()),
+            category: row[3].trim(),
+            isIncome: row[4].trim().toLowerCase() == 'income',
+          ));
+        }
       }
-    } else {
-      throw Exception('Storage permission denied');
+
+      return importedTransactions;
+    } catch (e) {
+      rethrow;
     }
   }
 }
-  
-  
